@@ -37,6 +37,24 @@ setup verilator "verilator-src" "verilator-build" "${VERILATOR_INSTALL_DIR}" "${
 setup rvgnu "${RVGNU_INSTALL_DIR}"
 ----
 
+==== docker
+
+See `docker/` for more details. 
+
+quick `docker-compose`::
+[,bash]
+----
+docker-compose -f docker/docker-compose.yml --env-file docker/.env up --build
+----
+
+run `docker-compose`::
+[,bash]
+----
+docker run -it -v"$PWD":/work-esel-proc JoGei/esel-proc-deps:latest-default-debian-stable
+# in docker cd into mounted repo and source env vars and venv
+cd /work-esel-proc
+. utils/scripts/env_helper.sh docker/.env ../.venv
+----
 
 === build
 

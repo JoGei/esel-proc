@@ -1,0 +1,66 @@
+ARG BASE_IMAGE=debian:stable
+ARG workspace_dir
+ARG ENV_VERILATOR_VERSION
+ARG ENV_VERILATOR_INSTALL_DIR
+ARG ENV_RVGNU_INSTALL_DIR
+ARG ENV_SPIKE_INSTALL_DIR
+ARG ENV_RISCV
+ARG ENV_RISCV_PREFIX_VAR
+ARG ENV_RISCV_PREFIX
+###########################################################
+FROM ${BASE_IMAGE} AS esel-proc-deps
+ARG workspace_dir=/work
+ENV workspace_dir=${workspace_dir}
+ARG ENV_VERILATOR_VERSION
+ARG ENV_VERILATOR_INSTALL_DIR
+ARG ENV_RVGNU_INSTALL_DIR
+ARG ENV_SPIKE_INSTALL_DIR
+ARG ENV_RISCV
+ARG ENV_RISCV_PREFIX_VAR
+ARG ENV_RISCV_PREFIX
+# overall build config
+ENV ENV_VERILATOR_VERSION=${ENV_VERILATOR_VERSION}
+ENV ENV_VERILATOR_INSTALL_DIR=${ENV_VERILATOR_INSTALL_DIR}
+ENV ENV_RVGNU_INSTALL_DIR=${ENV_RVGNU_INSTALL_DIR}
+ENV ENV_SPIKE_INSTALL_DIR=${ENV_SPIKE_INSTALL_DIR}
+ENV ENV_RISCV=${ENV_RISCV}
+ENV ENV_RISCV_PREFIX_VAR=${ENV_RISCV_PREFIX_VAR}
+ENV ENV_RISCV_PREFIX=${ENV_RISCV_PREFIX}
+#####################
+# Docker CA Certif. #
+#####################
+RUN apt-get update && \
+    apt-get install -y ca-certificates && \
+    update-ca-certificates
+#########################
+# Prerequisite packages #
+#########################
+RUN \
+  --mount=type=bind,source=".",target=${workspace_dir} \
+  . "${workspace_dir}/utils/scripts/setup_helper.sh" && \
+  setup apt && \
+  rm -rf /var/lib/apt/lists/*
+#################
+# python (v)env #
+#################
+RUN \
+  --mount=type=bind,source=".",target=${workspace_dir} \
+  . "${workspace_dir}/utils/scripts/setup_helper.sh" && \
+  setup venv ".venv" "${workspace_dir}"
+#############
+# Verilator #
+#############
+RUN \
+  --mount=type=bind,source=".",target=${workspace_dir} \
+  . "${workspace_dir}/utils/scripts/setup_helper.sh" && \
+  . ".venv/bin/activate" && \
+  setup verilator "verilator-src" "verilator-build" "${ENV_VERILATOR_INSTALL_DIR}" "${ENV_VERILATOR_VERSION}"
+###################
+# RVGNU toolchain #
+###################
+RUN \
+  --mount=type=bind,source=".",target=${workspace_dir} \
+  . "${workspace_dir}/utils/scripts/setup_helper.sh" && \
+  . ".venv/bin/activate" && \
+  setup rvgnu "${ENV_RVGNU_INSTALL_DIR}"
+
