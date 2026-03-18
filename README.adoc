@@ -1,0 +1,63 @@
+= esel-proc: the Emulating SErial Latchup PROCessor
+
+Driven by intuition, a fair amount of brute force, and lack of time to research the problems and literature. `¯\\_(ツ)_/¯`
+
+https://www.latchup.app/[Latchup - Think you're good at RTL? Prove it.] 
+image:https://latchup.app/badge/user/91eb2527-fcbb-4cc4-89da-fea225edffc7.svg[Latchup Badge, link=https://latchup.app/user/91eb2527-fcbb-4cc4-89da-fea225edffc7]
+
+`esel-proc` is a generated SoC powered by the https://github.com/olofk/serv[award-winning serv] RISC-V processor. SERV executes a program from a generated ROM that contains a cross-compiled C solution of the latchup.app problem. The Soc interfaces with the main latchup streaming interface via a databus peripheral `rtl/eselproc_latchup_interface` (LIF). 
+In essence, `esel-proc` emulates the hardware by executing the C solution and Memory-mapped Input/Output (MMIO) to the LIF. (https://github.com/JoGei/latchup-subs[CODE] for reference of my more traditional designs)
+
+NOTE: Esel (orig. German, engl. "donkey"), because `esel-proc` is *slow*. Being fast is not a donkey's optimization goal. Being reliable, easy to handle, and an all-around chill animals is, though.
+
+== usage
+
+=== prerequisites
+
+==== native debian
+
+In `utils/scripts/setup_helper.sh` are tool build instructions for all requirements to run `esel-proc` on a debian-based distro.
+
+The following installs all necessary tools inside the `ESELPROC_ROOT`::
+[,bash]
+----
+cd esel-proc
+export ESELPROC_ROOT=${PWD}   # this repository's local copy
+utils/scripts/setup_helper.sh # source setup helper
+apt install $(get_apt_deps)   # install apt packages
+setup venv .venv .            # install a python3 virtual env with dependencies
+
+# prepare the environment variables and source .venv
+. utils/scripts/env_helper.sh utils/scripts/.env .venv  
+
+# install a verilator
+setup verilator "verilator-src" "verilator-build" "${VERILATOR_INSTALL_DIR}" "${VERILATOR_VERSION}"
+
+# install a risc-v gnu toolchain
+setup rvgnu "${RVGNU_INSTALL_DIR}"
+----
+
+
+=== build
+
+after dependencies resolved (docker or native), source the environment, then simply `make`
+
+build a `esel-proc` solution for SOL::
+[,bash]
+----
+make [SOL=01_multiplier, 02_divider, ...]
+----
+
+This generates a ready to use latchup solution in `build/rtl/Solution.v`.
+Change `SOL` build variable to supported algorithms in `problems/`.
+
+=== test
+
+test a `esel-proc` solution for SOL::
+[,bash]
+----
+make test [SOL=01_multiplier,...]
+# vcd treace in ESEL_ROOT/*.vcd
+----
+
+WARNING: This is a "for fun" project, like solving the original latchup.app problems with traditional hardware design was for me. This project is far from "production grade" and heaviliy involved genAI to "glue" together the different tools, abstraction levels, and coding of the LIF variants.
