@@ -3,7 +3,7 @@
 Driven by intuition, a fair amount of brute force, and lack of time to research the problems and literature. `¯\\_(ツ)_/¯`
 
 https://www.latchup.app/[Latchup - Think you're good at RTL? Prove it.] 
-image:https://latchup.app/badge/user/91eb2527-fcbb-4cc4-89da-fea225edffc7.svg[Latchup Badge, link=https://latchup.app/user/91eb2527-fcbb-4cc4-89da-fea225edffc7]
+image:https://latchup.app/badge/user/f62eb5b5-15c3-4357-91c1-296e090f76aa.svg[Latchup Badge, link=https://latchup.app/user/f62eb5b5-15c3-4357-91c1-296e090f76aa]
 
 `esel-proc` is a generated SoC powered by the https://github.com/olofk/serv[award-winning serv] RISC-V processor. SERV executes a program from a generated ROM that contains a cross-compiled C solution of the latchup.app problem. The Soc interfaces with the main latchup streaming interface via a databus peripheral `rtl/eselproc_latchup_interface` (LIF). 
 In essence, `esel-proc` emulates the hardware by executing the C solution and Memory-mapped Input/Output (MMIO) to the LIF. (https://github.com/JoGei/latchup-subs[CODE] for reference of my more traditional designs)
