@@ -1,0 +1,10 @@
+= rtl/latchup
+
+This dir contains fixed components to build the esel-proc solver circuitry for latchup.app
+
+The problem subdirectories contain a problem specific `latchup_if.sv` and `Solution.v.in`` due to the changing streaming interface.
+
+In `Solution.sv.in`, the following files have to copied over per the @*_MODULE@ placeholders::
+ - Fixed filed contents of modules of this dir: `latchup_dbus.sv`, `latchup_sram.sv`, `latchup_soc.sv` (Order is important)
+ - Generated `boot_rom.sv` ROM module (from esel-proc/sw/)
+ - Generated file contents of the `serv_top_rf.sv` (from fusesoc)
