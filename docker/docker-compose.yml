@@ -1,0 +1,22 @@
+services:
+  esel-proc:
+    image: JoGei/esel-proc-deps:latest-default-debian-stable
+    build:
+      context: ..
+      dockerfile: docker/dockerfile
+      target: esel-proc-deps
+      args:
+        workspace_dir: "${workspace_dir}"
+        ENV_VERILATOR_VERSION: "${ENV_VERILATOR_VERSION}"
+        ENV_VERILATOR_INSTALL_DIR: "${ENV_VERILATOR_INSTALL_DIR}"
+        ENV_RVGNU_INSTALL_DIR: "${ENV_RVGNU_INSTALL_DIR}"
+        ENV_SPIKE_INSTALL_DIR: "${ENV_SPIKE_INSTALL_DIR}"
+        ENV_RISCV: "${ENV_RISCV}"
+        ENV_RISCV_PREFIX_VAR: "${ENV_RISCV_PREFIX_VAR}"
+        ENV_RISCV_PREFIX: "${ENV_RISCV_PREFIX}"
+    environment:
+      workspace_dir: "${workspace_dir}"
+    volumes:
+      - type: bind
+        source: ..
+        target: ${workspace_dir}

@@ -1,0 +1,105 @@
+= docker images for esel-proc
+
+== prerequisites
+
+In addition to a regular Docker installation, `buildx` is required for building the esel-proc images locally.
+
+dependencies::
+[,bash]
+----
+apt install docker-buildx-plugin
+----
+
+== container/image types
+
+=== `esel-proc-deps`
+
+The `*-deps` image is a `debian-stable` images with all the operating system packages required by `esel-proc-*` (t.b.d.).
+
+NOTE: `esel-proc-deps` is not intended to be used right now until more powerful environments are implemented. Then, sse `*-dev` or `*-*sim` instead.
+
+=== `esel-proc-dev`
+
+t.b.d.
+
+== use
+
+NOTE: Since you are mounted to the local repository, you can keep working on your files locally, and lint/simulate with tools provided through the esel-proc-* image's shell.
+
+=== prebuilt images
+
+==== fetch prebuilt images
+
+(t.b.d.)
+
+Pull the latest `esel-proc-deps` image::
+[,bash]
+----
+docker pull t.b.d.
+----
+
+==== run pre-built images
+
+[,bash]
+----
+cd path/to/esel-proc/
+# ... with a pulled image from esel-proc's container registry
+docker run -it --rm -v $(pwd):/work-esel-proc -v .:/esel-proc <container-registry>/JoGei/esel-proc/esel-proc-deps:latest
+----
+
+=== local build and run (buildx)
+
+==== build image locally
+
+You can build the images locally as follows::
+[,bash]
+----
+cd path/to/esel-proc/
+source docker/.env
+
+# Build esel-proc-deps image
+docker buildx build . -f docker/dockerfile \
+                      --tag JoGei/esel-proc-deps:latest-default-debian-stable \
+                      --target esel-proc-deps \
+                      --build-arg BASE_IMAGE=debian:stable \
+                      --build-arg workspace_dir=${workspace_dir} \
+                      --build-arg ENV_VERILATOR_VERSION=${ENV_VERILATOR_VERSION} \
+                      --build-arg ENV_VERILATOR_INSTALL_DIR=${ENV_VERILATOR_INSTALL_DIR} \
+                      --build-arg ENV_RVGNU_INSTALL_DIR=${ENV_RVGNU_GNU_INSTALL_DIR} \
+                      --build-arg ENV_SPIKE_INSTALL_DIR=${ENV_SPIKE_INSTALL_DIR}
+----
+
+==== run local image
+
+You can run and mount a local copy of the esel-proc repository as follows::
+[,bash]
+----
+cd path/to/esel-proc/
+
+# run the esel-proc-deps image and mount your local repository with a locally built image
+docker run -it --rm -v $(pwd):$(pwd) -v .:/esel-proc JoGei/esel-proc-deps:latest-default-debian-stable
+
+# inside the docker you now have access to all the build tools required for linting, simulation, etc (no ASIC synthesis ...)
+
+/verilator-install/bin/verilator --version
+/rvgnu-install/bin/riscv-none-elf-gcc --version
+
+----
+
+=== build and run (compose)
+
+From `esel-proc` root directory
+
+quick `docker-compose`::
+[,bash]
+----
+docker-compose -f docker/docker-compose.yml --env-file docker/.env up --build
+----
+
+run `docker-compose`::
+[,bash]
+----
+docker run -it -v"$PWD":/work-esel-proc docker-esel-proc:latest
+----
+
+WARNING: This is a "for fun" project, like solving the original latchup.app problems with traditional hardware design was for me. This project is far from "production grade" and heaviliy involved genAI to "glue" together the different tools, abstraction levels, and coding of the LIF variants.
