@@ -8,6 +8,8 @@ image:https://latchup.app/badge/user/f62eb5b5-15c3-4357-91c1-296e090f76aa.svg[La
 `esel-proc` is a generated SoC powered by the https://github.com/olofk/serv[award-winning serv] RISC-V processor. SERV executes a program from a generated ROM that contains a cross-compiled C solution of the latchup.app problem. The Soc interfaces with the main latchup streaming interface via a databus peripheral `rtl/eselproc_latchup_interface` (LIF). 
 In essence, `esel-proc` emulates the hardware by executing the C solution and Memory-mapped Input/Output (MMIO) to the LIF. (https://github.com/JoGei/latchup-subs[CODE] for reference of my more traditional designs)
 
+image:doc/figs/esel-proc-arch.svg[align="center"]
+
 NOTE: Esel (orig. German, engl. "donkey"), because `esel-proc` is *slow*. Being fast is not a donkey's optimization goal. Being reliable, easy to handle, and an all-around chill animals is, though.
 
 == usage
