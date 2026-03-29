@@ -92,11 +92,15 @@ jobs:
         run: |
           docker run --rm \
             --user "$(id -u):$(id -g)" \
+            --env HOME=/tmp/esel-proc-home \
+            --env XDG_CACHE_HOME=/tmp/esel-proc-cache \
+            --env XDG_CONFIG_HOME=/tmp/esel-proc-config \
             --volume "${GITHUB_WORKSPACE}:/work-esel-proc" \
             --workdir /work-esel-proc \
             "${{ needs.deps-image.outputs.image-ref }}" \
             bash -lc "
               set -euo pipefail
+              mkdir -p \"${HOME}\" \"${XDG_CACHE_HOME}\" \"${XDG_CONFIG_HOME}\"
               . utils/scripts/env_helper.sh docker/.env /.venv
               make test SOL=${{ matrix.SOL }}
             "
