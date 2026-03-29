@@ -113,7 +113,7 @@ static inline uint32_t median5_u32packed(uint32_t abcd, uint32_t next) {
     return c;
 }
 
-#define LIF_FIFO_DEPTH 64
+#define LIF_FIFO_DEPTH 1
 
 void eselproc_solve_loop_fullmedian(void) {
   uint8_t x[5];

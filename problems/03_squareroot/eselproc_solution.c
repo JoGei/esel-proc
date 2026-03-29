@@ -25,6 +25,8 @@ uint16_t usqrt32(uint32_t x) {
     return (uint16_t)res;
 }
 
+#define LIF_FIFO_DEPTH 1
+
 void eselproc_solve_loop(void) {
 
   // Optional cleanup from previous transaction
@@ -32,15 +34,14 @@ void eselproc_solve_loop(void) {
   eselproc_lif_clear_fifos();
 
   // Ask hardware to accept exactly one input sample
-  eselproc_lif_control_set_sample_count(16);
+  eselproc_lif_control_set_sample_count(LIF_FIFO_DEPTH);
 
   // Wait until one sampled input vector is present in the input FIFO
-  while (!eselproc_lif_input_can_pop()) {
-  }
+  while (!eselproc_lif_input_can_pop()) { }
+
   do {
     // Pop one vector into the input shadow registers
-    while (!eselproc_lif_try_pop_i_payload()) {
-    }
+    while (!eselproc_lif_try_pop_i_payload()) { }
 
     // the eselproc-lif is generic. It offers synchronous FIFO-Lanes, each 32-bit wide. 
     // In the multiplier example we have a single 32-bit output FIFO and a single 32-bit

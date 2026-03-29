@@ -90,7 +90,7 @@ module Solution (
   // the LIF's FIFO depth... in theory more is better, but 1 is always enough as long as software caches
   // since this is a real input stream, we could also use the sliding window depth here and fetch the
   // first window into the fifo.
-  localparam int unsigned LIF_FIFO_DEPTH = 64;
+  localparam int unsigned LIF_FIFO_DEPTH = 1;
 
   // pack input signals for generic component interface 
   localparam int unsigned N_IN_W_PAYLOADS = 1;

@@ -91,12 +91,12 @@ module Solution (
   // pack input signals for generic component interface 
   localparam int unsigned N_IN_W_PAYLOADS = 1;
   logic [N_IN_W_PAYLOADS-1:0][31:0]  n_i_payload;
-  assign n_i_payload[0:0] = i_payload_x;
+  assign n_i_payload[0][31:0] = i_payload_x;
 
   // pack output signals for generic component interface 
   localparam int unsigned N_OUT_W_PAYLOADS = 1;
   logic [N_OUT_W_PAYLOADS-1:0][31:0] n_o_payload;
-  assign o_payload = n_o_payload[15:0];
+  assign o_payload = n_o_payload[0][15:0];
   
 
   eselproc_latchup_interface #(
