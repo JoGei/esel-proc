@@ -100,7 +100,7 @@ jobs:
             "${{ needs.deps-image.outputs.image-ref }}" \
             bash -lc "
               set -euo pipefail
-              mkdir -p \"${HOME}\" \"${XDG_CACHE_HOME}\" \"${XDG_CONFIG_HOME}\"
+              mkdir -p /tmp/esel-proc-home /tmp/esel-proc-cache /tmp/esel-proc-config
               . utils/scripts/env_helper.sh docker/.env /.venv
               make test SOL=${{ matrix.SOL }}
             "
