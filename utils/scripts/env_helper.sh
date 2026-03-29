@@ -11,7 +11,6 @@ source_env_lint() {
     echo "$key=$value_expanded"
   done < ${env_file}
 
-  export PATH="${VERILATOR_INSTALL_DIR}/bin:${PATH}"
   export PATH="${RVGNU_INSTALL_DIR}/bin:${PATH}"
   export PATH="${SPIKE_INSTALL_DIR}/bin:${PATH}"
   echo "[source_env_lint] done."
