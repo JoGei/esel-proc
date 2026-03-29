@@ -70,8 +70,9 @@ jobs:
     strategy:
       matrix:
         SOL: ["01_multiplier", "02_divider", "03_squareroot", "04_median_filter"]
+        CPU: ["serv", "picorv32"]
 
-    name: Build project (${{ matrix.SOL }})
+    name: Build project (${{ matrix.SOL }})@${{ matrix.CPU }}
     runs-on: ubuntu-latest
     needs: deps-image
     timeout-minutes: 60
@@ -102,13 +103,13 @@ jobs:
               set -euo pipefail
               mkdir -p /tmp/esel-proc-home /tmp/esel-proc-cache /tmp/esel-proc-config
               . utils/scripts/env_helper.sh docker/.env /.venv
-              make test SOL=${{ matrix.SOL }}
+              make test CPU=${{ matrix.CPU }} SOL=${{ matrix.SOL }} 
             "
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: esel-proc-build-${{ matrix.SOL }}
+          name: esel-proc-build-${{ matrix.CPU }}-${{ matrix.SOL }}
           path: |
             build/rtl
             build/sw
