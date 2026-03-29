@@ -45,8 +45,6 @@ jobs:
           tags: ${{ env.DEPS_IMAGE_NAME }}:${{ env.DEPS_IMAGE_TAG }}
           build-args: |
             workspace_dir=${{ env.workspace_dir }}
-            ENV_VERILATOR_VERSION=${{ env.ENV_VERILATOR_VERSION }}
-            ENV_VERILATOR_INSTALL_DIR=${{ env.ENV_VERILATOR_INSTALL_DIR }}
             ENV_RVGNU_INSTALL_DIR=${{ env.ENV_RVGNU_INSTALL_DIR }}
             ENV_SPIKE_INSTALL_DIR=${{ env.ENV_SPIKE_INSTALL_DIR }}
             ENV_RISCV=${{ env.ENV_RISCV }}

@@ -7,8 +7,6 @@ services:
       target: esel-proc-deps
       args:
         workspace_dir: "${workspace_dir}"
-        ENV_VERILATOR_VERSION: "${ENV_VERILATOR_VERSION}"
-        ENV_VERILATOR_INSTALL_DIR: "${ENV_VERILATOR_INSTALL_DIR}"
         ENV_RVGNU_INSTALL_DIR: "${ENV_RVGNU_INSTALL_DIR}"
         ENV_SPIKE_INSTALL_DIR: "${ENV_SPIKE_INSTALL_DIR}"
         ENV_RISCV: "${ENV_RISCV}"
