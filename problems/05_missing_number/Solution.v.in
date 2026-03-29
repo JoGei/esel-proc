@@ -1,0 +1,131 @@
+// Stream-based solution component
+//
+// Input stream interface:
+//   i_ready (output): Assert when ready to accept input
+//   i_valid (input): Asserted when input data is valid
+//   i_payload_* (input): Input payload fields
+//
+// Output interface:
+//   o_valid (output): Assert when output data is valid
+//   o_payload* (output): Output payload fields
+//
+// Handshaking: Data transfers when both ready and valid are high
+
+// In case anybody reads this. Well... I do not claim to be excellent at RTL. 
+// I tend to work on tools that generate, synthesize, and/or analyze it most of the time.
+// UNLINCENSED source code is here for ref.: https://github.com/JoGei/latchup-subs
+// Driven by intuition, brute force, and lack of research into problems and literature. ¯\_(ツ)_/¯
+
+// ... EDA is more my ballpark... The following is a 100% generated SoC
+// with a RISC-V CPU executing a program from a generated ROM that contains cross-compiled C
+// solution of the problem. The Soc interfaces with the latchup streaming interface via a 
+// databus peripheral "eselproc_if". 
+// In essence, this thing emulates the hardware by executing the C solution.
+// The project "esel-proc" (*e*mulating *se*quential *l*achtup *proc*essor) can be found
+// here: https://github.com/JoGei/esel-proc
+// Esel (orig. German, engl. "donkey"), because this thing is *slow*. Being fast is not a
+// donkey optimization goal. Being reliable, trustworthy, and all-around chill animals is. 
+// I like them ツ
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// C program containing solutions compiled into the BOOT_ROM. The eselproc_solve_loop is executed
+// called by main() in a while(1) loop. No termination.
+@ESELPROC_C_PROGRAM@
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// generated ROM module with compiled C solution
+@BOOT_ROM_MODULE@
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// daatabus module (wishbone)
+@ESELPROC_DBUS_MODULE@
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// synthesizable SRAM module -> in Sky130 will be FFs ~1K size
+@ESELPROC_SRAM_MODULE@
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// CPU module is a serv with register file
+@CPU_WRAPPER_MODULE@
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// SoC module instantiating cpu, dbus, sram, rom
+@ESELPROC_SOC_MODULE@
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// solution specific streaming I/O peripheral
+@LATCHUP_IF_MODULE@
+///////////////////////////////////////////////////////////////////////////////////////////////////
+module Solution (
+  input wire clk,
+  input wire reset,
+  output wire i_ready,
+  input wire i_valid,
+  input wire [16-1:0] i_payload_nums_fragment,
+  input wire i_payload_nums_last,
+  output wire [16-1:0] o_payload,
+  output wire o_valid
+);
+
+// Define your design here
+  logic        lif_wb_cyc;
+  logic        lif_wb_stb;
+  logic        lif_wb_we;
+  logic [3:0]  lif_wb_sel;
+  logic [31:0] lif_wb_adr;
+  logic [31:0] lif_wb_wdata;
+  logic [31:0] lif_wb_rdata;
+  logic        lif_wb_ack;
+
+  // the eselproc_soc only exposes the wishbone peripheral interface to LIF
+  eselproc_soc u_soc (
+    .clk          (clk),
+    .reset        (reset),
+
+    .o_lif_wb_cyc (lif_wb_cyc),
+    .o_lif_wb_stb (lif_wb_stb),
+    .o_lif_wb_we  (lif_wb_we),
+    .o_lif_wb_sel (lif_wb_sel),
+    .o_lif_wb_adr (lif_wb_adr),
+    .o_lif_wb_dat (lif_wb_wdata),
+    .i_lif_wb_dat (lif_wb_rdata),
+    .i_lif_wb_ack (lif_wb_ack)
+  );
+
+  // the LIF's FIFO depth... in theory more is better, but 1 is always enough as long as software caches
+  // since this is a real input stream, we could also use the sliding window depth here and fetch the
+  // first window into the fifo.
+  localparam int unsigned LIF_FIFO_DEPTH = 1;
+
+  // pack input signals for generic component interface 
+  localparam int unsigned N_IN_W_PAYLOADS = 1;
+  logic [N_IN_W_PAYLOADS-1:0][31:0]  n_i_payload;
+  assign n_i_payload[0] = {15'b0, i_payload_nums_last, i_payload_nums_fragment};
+
+  // pack output signals for generic component interface 
+  localparam int unsigned N_OUT_W_PAYLOADS = 1;
+  logic [N_OUT_W_PAYLOADS-1:0][31:0] n_o_payload;
+  assign o_payload = n_o_payload[0][15:0];
+  
+
+  eselproc_latchup_interface #(
+      .BASE_ADDR (32'h0002_0000)
+    , .N_IN_W_PAYLOADS(N_IN_W_PAYLOADS)
+    , .N_OUT_W_PAYLOADS(N_OUT_W_PAYLOADS)
+    , .INPUT_FIFO_DEPTH(LIF_FIFO_DEPTH)
+    , .OUTPUT_FIFO_DEPTH(LIF_FIFO_DEPTH)
+  ) u_eselproc_lif (
+    .clk         (clk),
+    .reset       (reset),
+
+    .o_ready     (i_ready), //(!sic, is an output)
+    .i_valid     (i_valid),
+    .i_payload   (n_i_payload),
+    .o_payload   (n_o_payload),
+    .o_valid     (o_valid),
+
+    .i_wb_cyc    (lif_wb_cyc),
+    .i_wb_stb    (lif_wb_stb),
+    .i_wb_we     (lif_wb_we),
+    .i_wb_sel    (lif_wb_sel),
+    .i_wb_adr    (lif_wb_adr),
+    .i_wb_dat    (lif_wb_wdata),
+    .o_wb_dat    (lif_wb_rdata),
+    .o_wb_ack    (lif_wb_ack)
+  );
+
+endmodule
