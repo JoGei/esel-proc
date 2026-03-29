@@ -47,14 +47,6 @@ RUN \
   --mount=type=bind,source=".",target=${workspace_dir} \
   . "${workspace_dir}/utils/scripts/setup_helper.sh" && \
   setup venv ".venv" "${workspace_dir}"
-#############
-# Verilator #
-#############
-RUN \
-  --mount=type=bind,source=".",target=${workspace_dir} \
-  . "${workspace_dir}/utils/scripts/setup_helper.sh" && \
-  . ".venv/bin/activate" && \
-  apt update && apt install verilator
 ###################
 # RVGNU toolchain #
 ###################

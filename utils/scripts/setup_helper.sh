@@ -3,7 +3,7 @@
 # Package dependencies
 get_apt_deps() {
   general_apt_dep="cmake build-essential git"
-  verilator_apt_dep="help2man autoconf automake autotools-dev bison curl flex g++ xz-utils wget libfl-dev ccache python3 python3-virtualenv python3-dev perl"
+  verilator_apt_dep="verilator help2man autoconf automake autotools-dev bison curl flex g++ xz-utils wget libfl-dev ccache python3 python3-virtualenv python3-dev perl"
   rvgnu_apt_dep="autoconf automake autotools-dev curl git libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool bc zlib1g-dev"
   spike_apt_dep="libboost-dev wget tar device-tree-compiler libboost-regex-dev libboost-system-dev"
   fusesoc_apt_dep="python3-venv python3-pip"
