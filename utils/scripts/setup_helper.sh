@@ -10,11 +10,8 @@ get_apt_deps() {
   echo "${general_apt_dep} ${verilator_apt_dep} ${rvgnu_apt_dep} ${spike_apt_dep} ${fusesoc_apt_dep}"
 }
 setup_apt() {
-  apt-get update
-  for pkg in "$(get_apt_deps)"; do 
-    apt-get install --no-install-recommends -y ${pkg}
-  done
-
+  apt update
+  apt install --no-install-recommends -y $(get_apt_deps)
 }
 setup_venv() {
   venv_dir="$1"
