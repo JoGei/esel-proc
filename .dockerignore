@@ -1,0 +1,7 @@
+.git
+.github
+.workflows
+.venv
+build
+*.vcd
+**/*.vcd
