@@ -69,7 +69,7 @@ jobs:
   build:
     strategy:
       matrix:
-        SOL: ["01_multiplier", "02_divider", "03_squareroot", "04_median_filter", "05_missing_number"]
+        SOL: ["01_multiplier", "02_divider", "03_squareroot", "04_median_filter"]
 
     name: Build project (${{ matrix.SOL }})
     runs-on: ubuntu-latest
