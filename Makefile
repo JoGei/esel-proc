@@ -4,6 +4,7 @@ ROOT_DIR  := $(CURDIR)
 BUILD_DIR := $(ROOT_DIR)/build
 
 SOL    ?= 01_multiplier
+CPU	   ?= serv
 ROMGEN ?= $(ROOT_DIR)/utils/python/gen_elf2svrom.py
 
 .PHONY: all sw rtl clean
@@ -19,6 +20,7 @@ sw:
 rtl: sw
 	$(MAKE) -C rtl \
 	  SOL=$(SOL) \
+	  CPU=$(CPU) \
 	  BUILD_DIR=$(BUILD_DIR) \
 	  build
 

@@ -105,6 +105,8 @@ module eselproc_soc #(
   // Data interconnect
   // SRAM is internal, latchup peripheral port is exported
   eselproc_wb_dbus_interconnect #(
+    .ROM_BASE        (32'h0000_FFFF), // unused
+    .ROM_SIZE        (32'h0000_0001), // unused
     .SRAM_BASE       (RAM_BASE),
     .SRAM_SIZE       (RAM_SIZE),
     .LATCHUP_IF_BASE (LATCHUP_IF_BASE),
@@ -121,6 +123,15 @@ module eselproc_soc #(
     .i_wb_dat     (dbus_wdata),
     .o_wb_dat     (dbus_rdata),
     .o_wb_ack     (dbus_ack),
+
+    .o_rom_wb_cyc (),
+    .o_rom_wb_stb (),
+    .o_rom_wb_we  (),
+    .o_rom_wb_sel (),
+    .o_rom_wb_adr (),
+    .o_rom_wb_dat (),
+    .i_rom_wb_dat (32'h0),
+    .i_rom_wb_ack (1'b0),
 
     .o_sram_wb_cyc(sram_wb_cyc),
     .o_sram_wb_stb(sram_wb_stb),
