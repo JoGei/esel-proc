@@ -365,7 +365,7 @@ module eselproc_latchup_interface #(
     //----------------------------------------------------------------------
     if (!flushing_q && control_q[16] && !out_fifo_empty) begin
       flushing_n    = 1'b1;
-      control_n[16] = 1'b0;
+      // control_n[16] = 1'b0; auto-flush i.e. don't clear flush request after flush
     end
 
     // While flushing, emit one vector per cycle.
