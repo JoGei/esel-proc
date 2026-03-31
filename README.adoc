@@ -5,7 +5,7 @@ Driven by intuition, a fair amount of brute force, and lack of time to research 
 https://www.latchup.app/[Latchup - Think you're good at RTL? Prove it.] 
 image:https://latchup.app/badge/user/f62eb5b5-15c3-4357-91c1-296e090f76aa.svg[Latchup Badge, link=https://latchup.app/user/f62eb5b5-15c3-4357-91c1-296e090f76aa]
 
-`esel-proc` is a generated SoC powered by the https://github.com/olofk/serv[award-winning serv] RISC-V processor. The processor executes fetches from a generated ROM that contains the cross-compiled C solution of the latchup problem. The processor communicates with the main latchup streaming interface via a databus peripheral `rtl/eselproc_latchup_interface` (LIF). 
+`esel-proc` is a generated SoC powered by RISC-V. Currently `esel-proc` supports the https://github.com/olofk/serv[award-winning serv] and https://github.com/YosysHQ/picorv32[YosysHQ PicoRV32]. The processor executes fetches from a generated ROM that contains the cross-compiled C solution of the latchup problem. The processor communicates with the main latchup streaming interface via a databus peripheral `rtl/eselproc_latchup_interface` (LIF). 
 In essence, `esel-proc` emulates the hardware by executing the C solution which samples and toggles the interface pins via Memory-mapped Input/Output (MMIO) to the LIF peripheral registers. (https://github.com/JoGei/latchup-subs[CODE] for reference of my more traditional designs)
 
 image:doc/figs/esel-proc-arch.svg[align="center"]
@@ -65,7 +65,7 @@ after dependencies resolved (docker or native), source the environment, then sim
 build a `esel-proc` solution for SOL::
 [,bash]
 ----
-make [SOL=01_multiplier, 02_divider, ...]
+make [SOL=01_multiplier, 02_divider, ...] [CPU=serv, picorv32]
 ----
 
 This generates a ready to use latchup solution in `build/rtl/Solution.v`.
@@ -76,7 +76,7 @@ Change `SOL` build variable to supported algorithms in `problems/`.
 test a `esel-proc` solution for SOL::
 [,bash]
 ----
-make test [SOL=01_multiplier,...]
+make test [SOL=01_multiplier,...] [CPU=serv, picorv32]
 # vcd treace in ESEL_ROOT/*.vcd
 ----
 
