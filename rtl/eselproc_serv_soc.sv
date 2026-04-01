@@ -1,6 +1,8 @@
 module eselproc_soc #(
   parameter logic [31:0] ROM_BASE        = 32'h0000_0000,
-  parameter logic [31:0] ROM_SIZE        = 32'h0000_4000,
+  parameter logic [31:0] ROM_SIZE        = 32'h0000_3000,
+  parameter logic [31:0] DROM_BASE       = 32'h0000_3000,
+  parameter logic [31:0] DROM_SIZE       = 32'h0000_1000,
   parameter logic [31:0] RAM_BASE        = 32'h0001_0000,
   parameter logic [31:0] RAM_SIZE        = 32'h0000_0400,
   parameter logic [31:0] LATCHUP_IF_BASE = 32'h0002_0000,
@@ -36,6 +38,16 @@ module eselproc_soc #(
   logic        dbus_cyc;
   logic        dbus_stb;
   logic        dbus_ack;
+
+  // Interconnect -> DROM
+  logic        drom_wb_cyc;
+  logic        drom_wb_stb;
+  logic        drom_wb_we;
+  logic [3:0]  drom_wb_sel;
+  logic [31:0] drom_wb_adr;
+  logic [31:0] drom_wb_wdata;
+  logic [31:0] drom_wb_rdata;
+  logic        drom_wb_ack;
 
   // Interconnect -> SRAM
   logic        sram_wb_cyc;
@@ -105,8 +117,8 @@ module eselproc_soc #(
   // Data interconnect
   // SRAM is internal, latchup peripheral port is exported
   eselproc_wb_dbus_interconnect #(
-    .ROM_BASE        (32'h0000_FFFF), // unused
-    .ROM_SIZE        (32'h0000_0001), // unused
+    .ROM_BASE        (DROM_BASE),
+    .ROM_SIZE        (DROM_SIZE),
     .SRAM_BASE       (RAM_BASE),
     .SRAM_SIZE       (RAM_SIZE),
     .LATCHUP_IF_BASE (LATCHUP_IF_BASE),
@@ -124,14 +136,14 @@ module eselproc_soc #(
     .o_wb_dat     (dbus_rdata),
     .o_wb_ack     (dbus_ack),
 
-    .o_rom_wb_cyc (),
-    .o_rom_wb_stb (),
-    .o_rom_wb_we  (),
-    .o_rom_wb_sel (),
-    .o_rom_wb_adr (),
-    .o_rom_wb_dat (),
-    .i_rom_wb_dat (32'h0),
-    .i_rom_wb_ack (1'b0),
+    .o_rom_wb_cyc (drom_wb_cyc),
+    .o_rom_wb_stb (drom_wb_stb),
+    .o_rom_wb_we  (drom_wb_we),
+    .o_rom_wb_sel (drom_wb_sel),
+    .o_rom_wb_adr (drom_wb_adr),
+    .o_rom_wb_dat (drom_wb_wdata),
+    .i_rom_wb_dat (drom_wb_rdata),
+    .i_rom_wb_ack (drom_wb_ack),
 
     .o_sram_wb_cyc(sram_wb_cyc),
     .o_sram_wb_stb(sram_wb_stb),
@@ -150,6 +162,24 @@ module eselproc_soc #(
     .o_lif_wb_dat (o_lif_wb_dat),
     .i_lif_wb_dat (i_lif_wb_dat),
     .i_lif_wb_ack (i_lif_wb_ack)
+  );
+
+  // DROM
+  eselproc_wb_drom #(
+    .BASE_ADDR (DROM_BASE),
+    .MEM_WORDS (DROM_SIZE/4)
+  ) u_drom (
+    .clk      (clk),
+    .reset    (reset),
+
+    .i_wb_cyc (drom_wb_cyc),
+    .i_wb_stb (drom_wb_stb),
+    .i_wb_we  (drom_wb_we),
+    .i_wb_sel (drom_wb_sel),
+    .i_wb_adr (drom_wb_adr),
+    .i_wb_dat (drom_wb_wdata),
+    .o_wb_dat (drom_wb_rdata),
+    .o_wb_ack (drom_wb_ack)
   );
 
   // SRAM
