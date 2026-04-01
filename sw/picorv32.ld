@@ -1,11 +1,11 @@
-/* link.ld */
+/* picorv32.ld */
 OUTPUT_ARCH(riscv)
 ENTRY(_start)
 
 MEMORY
 {
-    ROM (rx)  : ORIGIN = 0x00000, LENGTH = 64K /* maximum real size determined afterwards */
-    RAM (rwx) : ORIGIN = 0x10000, LENGTH = 1K
+    ROM (x)  : ORIGIN = 0x00000, LENGTH = 64K /* maximum real size determined afterwards */
+    RAM (rw) : ORIGIN = 0x10000, LENGTH = 1K
 }
 
 __stack_top = ORIGIN(RAM) + LENGTH(RAM);
