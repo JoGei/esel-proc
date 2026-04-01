@@ -112,12 +112,33 @@ def _collect_rom_sections(elf_path: str) -> tuple[RomSection, ...]:
         return tuple(rom_sections)
 
 
-def build_rom_image(elf_path: str, data_width: int = 32) -> RomImage:
+def _matches_section_kind(section: RomSection, section_kind: str) -> bool:
+    if section_kind == "all":
+        return True
+    if section_kind == "exec":
+        return section.executable
+    if section_kind == "nonexec":
+        return not section.executable
+    raise ValueError(f"Unsupported section kind: {section_kind}")
+
+
+def build_rom_image(
+    elf_path: str,
+    data_width: int = 32,
+    section_kind: str = "all",
+) -> RomImage:
     if data_width % 8 != 0:
         raise ValueError("data_width must be a multiple of 8")
 
     word_bytes = data_width // 8
-    sections = _collect_rom_sections(elf_path)
+    sections = tuple(
+        sec
+        for sec in _collect_rom_sections(elf_path)
+        if _matches_section_kind(sec, section_kind)
+    )
+
+    if not sections:
+        return RomImage(base_lma=0, image=bytes(word_bytes), sections=())
 
     base_lma = min(sec.lma for sec in sections)
     end_lma = max(sec.lma_end for sec in sections)
@@ -213,10 +234,15 @@ def emit_sv_rom_from_elf(
     sv_path: str,
     module_name: str = "eselproc_wb_rom",
     data_width: int = 32,
+    section_kind: str = "all",
     annotate_asm: bool = False,
     objdump: str = "riscv32-unknown-elf-objdump",
 ) -> None:
-    rom = build_rom_image(elf_path=elf_path, data_width=data_width)
+    rom = build_rom_image(
+        elf_path=elf_path,
+        data_width=data_width,
+        section_kind=section_kind,
+    )
 
     disasm_by_vma = _run_objdump(elf_path, objdump=objdump) if annotate_asm else None
     annotations = _build_word_annotations(
@@ -319,6 +345,12 @@ def build_argparser() -> argparse.ArgumentParser:
         help="ROM word width in bits (must be 32 for this Wishbone wrapper)",
     )
     parser.add_argument(
+        "--section-kind",
+        choices=("all", "exec", "nonexec"),
+        default="all",
+        help="Which allocated ROM-backed ELF sections to emit",
+    )
+    parser.add_argument(
         "--annotate-asm",
         action="store_true",
         help="Annotate ROM entries with RISC-V disassembly comments",
@@ -344,6 +376,7 @@ def main() -> int:
             sv_path=args.sv,
             module_name=args.module_name,
             data_width=args.data_width,
+            section_kind=args.section_kind,
             annotate_asm=args.annotate_asm,
             objdump=args.objdump,
         )
