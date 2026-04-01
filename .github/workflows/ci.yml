@@ -109,7 +109,7 @@ jobs:
   test:
     strategy:
       matrix:
-        SOL: ["01_multiplier", "02_divider", "03_squareroot", "04_median_filter", "07_number_of_inversions", "08_counting_sheep"]
+        SOL: ["01_multiplier", "02_divider", "03_squareroot", "04_median_filter", "06_rasterize_line", "07_number_of_inversions", "08_counting_sheep"]
         CPU: ["serv", "picorv32"]
 
     name: Test project (${{ matrix.SOL }})@${{ matrix.CPU }}
