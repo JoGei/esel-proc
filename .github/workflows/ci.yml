@@ -109,10 +109,10 @@ jobs:
   test:
     strategy:
       matrix:
-        SOL: ["01_multiplier", "02_divider", "03_squareroot", "04_median_filter"]
+        SOL: ["01_multiplier", "02_divider", "03_squareroot", "04_median_filter", "08_counting_sheep"]
         CPU: ["serv", "picorv32"]
 
-    name: Build project (${{ matrix.SOL }})@${{ matrix.CPU }}
+    name: Test project (${{ matrix.SOL }})@${{ matrix.CPU }}
     runs-on: ubuntu-latest
     needs: deps-image
     timeout-minutes: 60
@@ -129,7 +129,7 @@ jobs:
       - name: Load deps image
         run: docker load --input /tmp/esel-proc-deps.tar
 
-      - name: Build inside deps image
+      - name: Test inside deps image
         run: |
           docker run --rm \
             --user "$(id -u):$(id -g)" \
