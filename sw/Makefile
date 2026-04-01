@@ -2,7 +2,7 @@
 #
 # Expected files:
 #   crt0.S
-#   link.ld
+#   $(CPU).ld
 #   common .c / .S files in ./sw such as drivers
 #   solution-specific .c files in ../problems/$(SOL)/
 #
@@ -31,7 +31,11 @@ RTL_BUILD_DIR := $(BUILD_DIR)/rtl
 
 ROMGEN     ?= $(abspath ../utils/python/gen_elf2svrom.py)
 ROM_MODULE := eselproc_wb_rom
+DROM_MODULE := eselproc_wb_drom
 ROM_WIDTH  := 32
+
+# serv or picorv32
+CPU ?= serv
 
 ARCH := -march=rv32i -mabi=ilp32
 
@@ -53,7 +57,7 @@ ASFLAGS := $(ARCH) \
 LDFLAGS := $(ARCH) \
            -nostdlib -nostartfiles -ffreestanding \
            -Wl,--gc-sections \
-           -Wl,-T,link.ld \
+           -Wl,-T,$(CPU).ld \
            -Wl,-Map,$(SW_BUILD_DIR)/$(TARGET).map \
            -flto
 
@@ -76,12 +80,21 @@ ELF    := $(SW_BUILD_DIR)/$(TARGET).elf
 BIN    := $(SW_BUILD_DIR)/$(TARGET).bin
 DIS    := $(SW_BUILD_DIR)/$(TARGET).dis
 ROM_SV := $(RTL_BUILD_DIR)/$(ROM_MODULE).sv
+DROM_SV := $(RTL_BUILD_DIR)/$(DROM_MODULE).sv
+
+ROM_SECTION_KIND := all
+ROM_TARGETS := $(ROM_SV)
+
+ifeq ($(CPU),serv)
+ROM_SECTION_KIND := exec
+ROM_TARGETS += $(DROM_SV)
+endif
 
 .PHONY: all clean rom disasm size
 
 all: $(ELF) $(BIN) $(DIS)
 
-rom: $(ROM_SV)
+rom: $(ROM_TARGETS)
 
 size: $(ELF)
 	$(SIZE) $(ELF)
@@ -103,7 +116,7 @@ $(SW_BUILD_DIR)/%.o: %.S | $(SW_BUILD_DIR)
 	@mkdir -p $(dir $@)
 	$(CC) $(ASFLAGS) -c $< -o $@
 
-$(ELF): $(OBJS) link.ld | $(SW_BUILD_DIR)
+$(ELF): $(OBJS) $(CPU).ld | $(SW_BUILD_DIR)
 	$(CC) $(OBJS) $(LDFLAGS) -lgcc -o $@
 	$(SIZE) $@
 
@@ -118,8 +131,18 @@ $(ROM_SV): $(ELF) $(ROMGEN) | $(RTL_BUILD_DIR)
 		$< \
 		$@ \
 		--module-name $(ROM_MODULE) \
+		--section-kind $(ROM_SECTION_KIND) \
 		--data-width $(ROM_WIDTH) \
 		--annotate-asm \
+		--objdump $(OBJDUMP)
+
+$(DROM_SV): $(ELF) $(ROMGEN) | $(RTL_BUILD_DIR)
+	$(PYTHON) $(ROMGEN) \
+		$< \
+		$@ \
+		--module-name $(DROM_MODULE) \
+		--section-kind nonexec \
+		--data-width $(ROM_WIDTH) \
 		--objdump $(OBJDUMP)
 
 clean:

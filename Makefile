@@ -13,6 +13,7 @@ all: rtl
 sw:
 	$(MAKE) -C sw \
 	  SOL=$(SOL) \
+	  CPU=$(CPU) \
 	  ROMGEN=$(ROMGEN) \
 	  BUILD_DIR=$(BUILD_DIR) \
 	  rom
